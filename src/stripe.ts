@@ -6,7 +6,7 @@ type Bindings = {
     SUPABASE_KEY: string;
 };
 
-type StripeLocale = 'auto' | 'en' | 'de';
+type StripeLocale = 'auto' | 'en' | 'de' | 'pl' | 'ro';
 
 type StripeParams = {
 	amount: string;

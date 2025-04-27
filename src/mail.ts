@@ -40,7 +40,9 @@ mailEndpoint.post('/submit-form', async (c) => {
 		}
 
 		return Response.json(data);
-	} catch (error) {}
+	} catch (error) {
+		return Response.json({error}, {status: 500});
+	}
 });
 
 export default mailEndpoint;
