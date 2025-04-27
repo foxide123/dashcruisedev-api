@@ -15,9 +15,9 @@ type StripeParams = {
   planName: string;
 }
 
-const app = new Hono<{ Bindings: Bindings }>();
+const stripeEndpoint = new Hono<{ Bindings: Bindings }>();
 
-app.post('/checkout-session', async (c) => {
+stripeEndpoint.post('/checkout-session', async (c) => {
     const { amount, currency, language, planName } = (await c.req.json()) as StripeParams;
 
     try{
@@ -53,3 +53,5 @@ app.post('/checkout-session', async (c) => {
       return c.json({error: "Error while creating checkout session"}, 500);
     }}
 );
+
+export default stripeEndpoint;
