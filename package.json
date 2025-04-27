@@ -19,6 +19,7 @@
 	"dependencies": {
 		"@hono/zod-validator": "^0.4.3",
 		"@supabase/supabase-js": "^2.49.4",
-		"hono": "^4.7.7"
+		"hono": "^4.7.7",
+		"stripe": "^18.0.0"
 	}
 }
