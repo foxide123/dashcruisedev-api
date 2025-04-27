@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import Stripe from "stripe";
 
 type Bindings = {
-    STRIPE_SECRET_KEY: string;
+    STRIPE_SECRET_KEY_TEST: string;
     SUPABASE_KEY: string;
 };
 
@@ -21,7 +21,7 @@ stripeEndpoint.post('/checkout-session', async (c) => {
     const { amount, currency, language, planName } = (await c.req.json()) as StripeParams;
 
     try{
-      const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, {
+      const stripe = new Stripe(c.env.STRIPE_SECRET_KEY_TEST, {
         //eslint-disable-next-line
         apiVersion: "2025-02-24.acacia; custom_checkout_beta=v1" as any,
         });
