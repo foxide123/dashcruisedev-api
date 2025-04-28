@@ -41,7 +41,7 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 			line_items: [
 				{
 					quantity: 1,
-          price: "price_1R4ATYRwMzr6Vk2TslQMw3R0"
+          price: "price_1RJ1Z6RwMzr6Vk2TN6PNcOfb"
 					/* price_data: {
 						currency: currency,
 						product_data: { name: 'Website Plan' },
