@@ -71,13 +71,16 @@ stripeEndpoint.post('/verify-session/:sessionId', zValidator('param', z.object({
 		});
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
+
 		return c.json(
 			{
-				email: session.customer_email,
-				subscriptionId: session.subscription,
-				paymentStatus: session.payment_status,
-				mode: session.mode,
-				plan: session.metadata?.plan,
+        data: {
+          email: session.customer_email,
+          subscriptionId: session.subscription,
+          paymentStatus: session.payment_status,
+          mode: session.mode,
+          plan: session.metadata?.plan,
+        }
 			},
 			{ status: 200 },
 		);
