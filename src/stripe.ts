@@ -41,12 +41,13 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 			line_items: [
 				{
 					quantity: 1,
-					price_data: {
+          price: "price_1R4ATYRwMzr6Vk2TslQMw3R0"
+					/* price_data: {
 						currency: currency,
 						product_data: { name: 'Website Plan' },
 						recurring: { interval: 'month' },
 						unit_amount: Math.round(Number(amount) * 100),
-					},
+					}, */
 				},
 			],
 			metadata: {
