@@ -4,7 +4,7 @@ import { Hono } from 'hono';
 import Stripe from 'stripe';
 
 type Bindings = {
-	STRIPE_SECRET_KEY_TEST: string;
+	STRIPE_SECRET_KEY_LIVE: string;
 	SUPABASE_KEY: string;
 };
 
@@ -41,7 +41,7 @@ type SessionParams = {
 const stripeEndpoint = new Hono<{ Bindings: Bindings }>();
 
 stripeEndpoint.post('/website-plans/get-prices', async (c) => {
-	const stripe = new Stripe(c.env.STRIPE_SECRET_KEY_TEST, {
+	const stripe = new Stripe(c.env.STRIPE_SECRET_KEY_LIVE, {
 		apiVersion: '2025-02-24.acacia; custom_checkout_beta=v1' as any,
 	});
 
@@ -61,7 +61,7 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 	try {
 		let { lookupKeyWithoutCurrency, language, currency } = (await c.req.json()) as StripeParams;
 
-		const stripe = new Stripe(c.env.STRIPE_SECRET_KEY_TEST, {
+		const stripe = new Stripe(c.env.STRIPE_SECRET_KEY_LIVE, {
 			apiVersion: '2025-02-24.acacia; custom_checkout_beta=v1' as any,
 		});
 
@@ -133,7 +133,7 @@ stripeEndpoint.post('/verify-session/:sessionId', zValidator('param', z.object({
 		if (!sessionId) {
 			return c.json({ error: 'Missing session id' }, { status: 400 });
 		}
-		const stripe = new Stripe(c.env.STRIPE_SECRET_KEY_TEST, {
+		const stripe = new Stripe(c.env.STRIPE_SECRET_KEY_LIVE, {
 			apiVersion: '2025-02-24.acacia; custom_checkout_beta=v1' as any,
 		});
 
