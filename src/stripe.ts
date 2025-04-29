@@ -17,44 +17,26 @@ const SupportedCurrenciesArray = SupportedCurrencies.join(', ');
 const PlanNames = ['startup', 'standard'];
 const PlanNamesString = PlanNames.join(', ');
 
+const WebsitePlansLookupKeys = [
+	'startup_monthly_usd',
+	'standard_monthly_usd',
+	'startup_monthly_eur',
+	'standard_monthly_eur',
+	'startup_monthly_pln',
+	'standard_monthly_pln',
+	'startup_monthly_ron',
+	'standard_monthly_ron',
+];
+
 type StripeParams = {
-	amount: string;
-	currency: SupportedCurrency;
+	lookupKeyWithoutCurrency: string;
 	language: StripeLocale;
-	planName: string;
+	currency: SupportedCurrency;
 };
 
 type SessionParams = {
 	sessionId: string;
 };
-
-const startupPrices = [
-	{ currency: 'usd', priceId: 'price_1RJDWwRwMzr6Vk2TQRAmnS1o', lookupKey: 'startup_monthly_usd' },
-	{ currency: 'eur', priceId: 'price_1RJDXfRwMzr6Vk2TszFNBMvM', lookupKey: 'startup_monthly_eur' },
-	{ currency: 'pln', priceId: 'price_1RJDZ6RwMzr6Vk2Ttf5VI8kV', lookupKey: 'startup_monthly_pln' },
-	{ currency: 'ron', priceId: 'price_1RJDYfRwMzr6Vk2TEqAp8Lq8', lookupKey: 'startup_monthly_ron' },
-];
-
-const standardPrices = [
-	{ currency: 'usd', priceId: 'price_1RJDZiRwMzr6Vk2TGdCN1q8P', lookupKey: 'standard_monthly_usd' },
-	{ currency: 'eur', priceId: 'price_1RJDa2RwMzr6Vk2TrxaXIQ1l', lookupKey: 'standard_monthly_eur' },
-	{ currency: 'pln', priceId: 'price_1RJDadRwMzr6Vk2Tq3Si6O7V', lookupKey: 'standard_monthly_pln' },
-	{ currency: 'ron', priceId: 'price_1RJDayRwMzr6Vk2To4zRHsV0', lookupKey: 'standard_monthly_ron' },
-];
-
-function getPriceId(planName: string, currency: SupportedCurrency): string | null {
-	if (planName.toLowerCase() === 'startup') {
-		const match = startupPrices.find((item) => item.currency === currency);
-		return match?.priceId || null;
-	}
-
-	if (planName.toLowerCase() === 'standard') {
-		const match = standardPrices.find((item) => item.currency === currency);
-		return match?.priceId || null;
-	}
-
-	return null;
-}
 
 const stripeEndpoint = new Hono<{ Bindings: Bindings }>();
 
@@ -65,39 +47,30 @@ stripeEndpoint.post('/website-plans/get-prices', async (c) => {
 
 	try {
 		const prices = await stripe.prices.list({
-			lookup_keys: [
-				'startup_monthly_usd',
-				'standard_monthly_usd',
-				'startup_monthly_eur',
-				'standard_monthly_eur',
-				'startup_monthly_pln',
-				'standard_monthly_pln',
-				'startup_monthly_ron',
-				'standard_monthly_ron',
-			],
-			expand: ['data.product']
+			lookup_keys: WebsitePlansLookupKeys,
+			expand: ['data.product'],
 		});
-		console.log("prices:", prices);
-		return c.json({data: prices});
+		console.log('prices:', prices);
+		return c.json({ data: prices });
 	} catch (error) {
-		return c.json({error: `There was an error fetching prices: ${error instanceof Error ? error.message : error}`})
+		return c.json({ error: `There was an error fetching prices: ${error instanceof Error ? error.message : error}` });
 	}
 });
 
 stripeEndpoint.post('/checkout-session', async (c) => {
 	try {
-		let { amount, currency, language, planName } = (await c.req.json()) as StripeParams;
+		let { lookupKeyWithoutCurrency, language, currency } = (await c.req.json()) as StripeParams;
 
-		planName = planName
-			.replace(
-				/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
+		const stripe = new Stripe(c.env.STRIPE_SECRET_KEY_TEST, {
+			apiVersion: '2025-02-24.acacia; custom_checkout_beta=v1' as any,
+		});
 
-				'',
-			)
-			.replace(/\s+/g, ' ')
-			.trim();
+		const prices = await stripe.prices.list({
+			lookup_keys: [`${lookupKeyWithoutCurrency}_${currency}`],
+			expand: ['data.product'],
+		});
 
-		const priceId = getPriceId(planName, currency);
+		const priceId = prices.data[0].id;
 
 		if (!priceId)
 			return c.json(
@@ -107,9 +80,12 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 				500,
 			);
 
-		const stripe = new Stripe(c.env.STRIPE_SECRET_KEY_TEST, {
-			apiVersion: '2025-02-24.acacia; custom_checkout_beta=v1' as any,
-		});
+		const product = prices.data[0].product;
+		let planName = 'unknown';
+
+		if (typeof product !== 'string' && 'name' in product) {
+			planName = product.name || 'unknown';
+		}
 
 		const session = await stripe.checkout.sessions.create({
 			mode: 'subscription',
