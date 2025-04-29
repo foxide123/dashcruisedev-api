@@ -96,6 +96,12 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 			cancel_url: 'https://dashcruisedev.com/en',
 			allow_promotion_codes: true,
 			locale: language,
+			automatic_tax: {
+				enabled: true,
+			},
+			customer_update: {
+				address: 'auto'
+			},
 /* 			customer_creation: "always", only allowed with payment method instead of subscription */
 			line_items: [
 				{
