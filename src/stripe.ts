@@ -74,7 +74,8 @@ stripeEndpoint.post('/website-plans/get-prices', async (c) => {
 				'standard_monthly_pln',
 				'startup_monthly_ron',
 				'standard_monthly_ron',
-			]
+			],
+			expand: ['data.product']
 		});
 		console.log("prices:", prices);
 		return c.json({data: prices});
