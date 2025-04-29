@@ -12,10 +12,10 @@ type StripeLocale = 'auto' | 'en' | 'de' | 'pl' | 'ro';
 
 type SupportedCurrency = 'usd' | 'eur' | 'pln' | 'ron';
 const SupportedCurrencies = ['usd', 'eur', 'pln', 'ron'];
-const SupportedCurrenciesArray = SupportedCurrencies.join(", ");
+const SupportedCurrenciesArray = SupportedCurrencies.join(', ');
 
-const PlanNames = ['startup', 'standard']
-const PlanNamesString = PlanNames.join(", ");
+const PlanNames = ['startup', 'standard'];
+const PlanNamesString = PlanNames.join(', ');
 
 type StripeParams = {
 	amount: string;
@@ -29,36 +29,59 @@ type SessionParams = {
 };
 
 const startupPrices = [
-	{ currency: 'usd', priceId: 'price_1RJ28bRwMzr6Vk2Tzr8us9Le' },
-	{ currency: 'eur', priceId: 'price_1RJ29TRwMzr6Vk2TICQAaVde' },
-	{ currency: 'pln', priceId: 'price_1RJ2O9RwMzr6Vk2T4wnOA5nD' },
-	{ currency: 'ron', priceId: 'price_1RJ2OwRwMzr6Vk2TVkN0ItZt' },
+	{ currency: 'usd', priceId: 'price_1RJ33URwMzr6Vk2TV66GwGhx', lookupKey: 'startup_monthly_usd' },
+	{ currency: 'eur', priceId: 'price_1RJ29TRwMzr6Vk2TICQAaVde', lookupKey: 'startup_monthly_eur' },
+	{ currency: 'pln', priceId: 'price_1RJ2O9RwMzr6Vk2T4wnOA5nD', lookupKey: 'startup_monthly_pln' },
+	{ currency: 'ron', priceId: 'price_1RJ2OwRwMzr6Vk2TVkN0ItZt', lookupKey: 'startup_monthly_ron' },
 ];
 
 const standardPrices = [
-  {currency: 'usd', priceId: 'price_1RJ2QiRwMzr6Vk2TnJhfjV0g'},
-  {currency: 'eur', priceId: 'price_1RJ2RHRwMzr6Vk2TnF2uRnT8'},
-  {currency: 'pln', priceId: 'price_1RJ2RzRwMzr6Vk2TKbVAOwa8'},
-  {currency: 'ron', priceId: 'price_1RJ2SdRwMzr6Vk2TNQ504PYw'}
-]
-
+	{ currency: 'usd', priceId: 'price_1RJ2QiRwMzr6Vk2TnJhfjV0g', lookupKey: 'standard_monthly_usd' },
+	{ currency: 'eur', priceId: 'price_1RJ2RHRwMzr6Vk2TnF2uRnT8', lookupKey: 'standard_monthly_eur' },
+	{ currency: 'pln', priceId: 'price_1RJ2RzRwMzr6Vk2TKbVAOwa8', lookupKey: 'standard_monthly_pln' },
+	{ currency: 'ron', priceId: 'price_1RJ2SdRwMzr6Vk2TNQ504PYw', lookupKey: 'standard_monthly_ron' },
+];
 
 function getPriceId(planName: string, currency: SupportedCurrency): string | null {
+	if (planName.toLowerCase() === 'startup') {
+		const match = startupPrices.find((item) => item.currency === currency);
+		return match?.priceId || null;
+	}
 
-  if(planName.toLowerCase() === 'startup'){
-    const match = startupPrices.find(item => item.currency === currency);
-    return match?.priceId || null;
-  }
+	if (planName.toLowerCase() === 'standard') {
+		const match = standardPrices.find((item) => item.currency === currency);
+		return match?.priceId || null;
+	}
 
-  if(planName.toLowerCase() === 'standard'){
-    const match = standardPrices.find(item => item.currency === currency);
-    return match?.priceId || null;
-  }
-
-  return null;
+	return null;
 }
 
 const stripeEndpoint = new Hono<{ Bindings: Bindings }>();
+
+stripeEndpoint.post('/website-plans/get-prices', async (c) => {
+	const stripe = new Stripe(c.env.STRIPE_SECRET_KEY_TEST, {
+		apiVersion: '2025-02-24.acacia; custom_checkout_beta=v1' as any,
+	});
+
+	try {
+		const prices = await stripe.prices.list({
+			lookup_keys: [
+				'startup_monthly_usd',
+				'standard_monthly_usd',
+				'startup_monthly_eur',
+				'standard_monthly_eur',
+				'startup_monthly_pln',
+				'standard_monthly_pln',
+				'startup_monthly_ron',
+				'standard_monthly_ron',
+			]
+		});
+		console.log("prices:", prices);
+		return c.json({data: prices});
+	} catch (error) {
+		return c.json({error: `There was an error fetching prices: ${error instanceof Error ? error.message : error}`})
+	}
+});
 
 stripeEndpoint.post('/checkout-session', async (c) => {
 	try {
@@ -73,12 +96,17 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 			.replace(/\s+/g, ' ')
 			.trim();
 
-    const priceId = getPriceId(planName, currency);
+		const priceId = getPriceId(planName, currency);
 
-    if(!priceId) return c.json({ error: `Error: We couldn't find a product for the provided currency and plan name. Currently we support plans: [${PlanNamesString}] and currencies: [${SupportedCurrenciesArray}]` }, 500);
+		if (!priceId)
+			return c.json(
+				{
+					error: `Error: We couldn't find a product for the provided currency and plan name. Currently we support plans: [${PlanNamesString}] and currencies: [${SupportedCurrenciesArray}]`,
+				},
+				500,
+			);
 
 		const stripe = new Stripe(c.env.STRIPE_SECRET_KEY_TEST, {
-			//eslint-disable-next-line
 			apiVersion: '2025-02-24.acacia; custom_checkout_beta=v1' as any,
 		});
 
