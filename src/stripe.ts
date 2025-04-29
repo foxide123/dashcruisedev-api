@@ -70,6 +70,8 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 			expand: ['data.product'],
 		});
 
+		if(!prices) return c.json({error: `Could not find stripe price for: ${lookupKeyWithoutCurrency}_${currency}`})
+
 		const priceId = prices.data[0].id;
 
 		if (!priceId)
