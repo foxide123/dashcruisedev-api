@@ -29,17 +29,17 @@ type SessionParams = {
 };
 
 const startupPrices = [
-	{ currency: 'usd', priceId: 'price_1RJ33URwMzr6Vk2TV66GwGhx', lookupKey: 'startup_monthly_usd' },
-	{ currency: 'eur', priceId: 'price_1RJ29TRwMzr6Vk2TICQAaVde', lookupKey: 'startup_monthly_eur' },
-	{ currency: 'pln', priceId: 'price_1RJ2O9RwMzr6Vk2T4wnOA5nD', lookupKey: 'startup_monthly_pln' },
-	{ currency: 'ron', priceId: 'price_1RJ2OwRwMzr6Vk2TVkN0ItZt', lookupKey: 'startup_monthly_ron' },
+	{ currency: 'usd', priceId: 'price_1RJDWwRwMzr6Vk2TQRAmnS1o', lookupKey: 'startup_monthly_usd' },
+	{ currency: 'eur', priceId: 'price_1RJDXfRwMzr6Vk2TszFNBMvM', lookupKey: 'startup_monthly_eur' },
+	{ currency: 'pln', priceId: 'price_1RJDZ6RwMzr6Vk2Ttf5VI8kV', lookupKey: 'startup_monthly_pln' },
+	{ currency: 'ron', priceId: 'price_1RJDYfRwMzr6Vk2TEqAp8Lq8', lookupKey: 'startup_monthly_ron' },
 ];
 
 const standardPrices = [
-	{ currency: 'usd', priceId: 'price_1RJ2QiRwMzr6Vk2TnJhfjV0g', lookupKey: 'standard_monthly_usd' },
-	{ currency: 'eur', priceId: 'price_1RJ2RHRwMzr6Vk2TnF2uRnT8', lookupKey: 'standard_monthly_eur' },
-	{ currency: 'pln', priceId: 'price_1RJ2RzRwMzr6Vk2TKbVAOwa8', lookupKey: 'standard_monthly_pln' },
-	{ currency: 'ron', priceId: 'price_1RJ2SdRwMzr6Vk2TNQ504PYw', lookupKey: 'standard_monthly_ron' },
+	{ currency: 'usd', priceId: 'price_1RJDZiRwMzr6Vk2TGdCN1q8P', lookupKey: 'standard_monthly_usd' },
+	{ currency: 'eur', priceId: 'price_1RJDa2RwMzr6Vk2TrxaXIQ1l', lookupKey: 'standard_monthly_eur' },
+	{ currency: 'pln', priceId: 'price_1RJDadRwMzr6Vk2Tq3Si6O7V', lookupKey: 'standard_monthly_pln' },
+	{ currency: 'ron', priceId: 'price_1RJDayRwMzr6Vk2To4zRHsV0', lookupKey: 'standard_monthly_ron' },
 ];
 
 function getPriceId(planName: string, currency: SupportedCurrency): string | null {
