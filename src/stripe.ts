@@ -51,7 +51,7 @@ stripeEndpoint.post('/website-plans/get-prices', async (c) => {
 			expand: ['data.product'],
 		});
 		console.log('prices:', prices);
-		return c.json({ data: prices, error:null });
+		return c.json({ data: prices, error: null });
 	} catch (error) {
 		return c.json({ data: null, error: `There was an error fetching prices: ${error instanceof Error ? error.message : error}` });
 	}
@@ -70,14 +70,14 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 			expand: ['data.product'],
 		});
 
-		if(!prices) return c.json({ data:null, error: `Could not find stripe price for: ${lookupKeyWithoutCurrency}_${currency}`})
+		if (!prices) return c.json({ data: null, error: `Could not find stripe price for: ${lookupKeyWithoutCurrency}_${currency}` });
 
 		const priceId = prices.data[0].id;
 
 		if (!priceId)
 			return c.json(
 				{
-					data:null,
+					data: null,
 					error: `Error: We couldn't find a product for the provided currency and plan name. Currently we support plans: [${PlanNamesString}] and currencies: [${SupportedCurrenciesArray}]`,
 				},
 				500,
@@ -99,10 +99,11 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 			automatic_tax: {
 				enabled: true,
 			},
+			/* can only be provided when customer is provided 		
 			customer_update: {
 				address: 'auto'
-			},
-/* 			customer_creation: "always", only allowed with payment method instead of subscription */
+			}, */
+			/* 			customer_creation: "always", only allowed with payment method instead of subscription */
 			line_items: [
 				{
 					quantity: 1,
@@ -119,7 +120,7 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 				plan: planName,
 			},
 		});
-		return c.json({ data: {sessionId: session.id}, error: null }, 201);
+		return c.json({ data: { sessionId: session.id }, error: null }, 201);
 	} catch (error) {
 		console.error('Stripe error:', error);
 		return c.json({ data: null, error: `Error while creating checkout session: ${error instanceof Error ? error.message : error}` }, 500);
@@ -147,14 +148,14 @@ stripeEndpoint.post('/verify-session/:sessionId', zValidator('param', z.object({
 					mode: session.mode,
 					plan: session.metadata?.plan,
 					customerDetails: session.customer_details,
-					customerId: session.customer
+					customerId: session.customer,
 				},
-				error: null
+				error: null,
 			},
 			{ status: 200 },
 		);
 	} catch (error) {
-		return c.json({ data:null, error: `There was an error while verifying session: ${error instanceof Error ? error.message : error}` });
+		return c.json({ data: null, error: `There was an error while verifying session: ${error instanceof Error ? error.message : error}` });
 	}
 });
 
