@@ -96,6 +96,7 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 			cancel_url: 'https://dashcruisedev.com/en',
 			allow_promotion_codes: true,
 			locale: language,
+			customer_creation: "always",
 			line_items: [
 				{
 					quantity: 1,
