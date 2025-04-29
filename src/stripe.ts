@@ -140,6 +140,8 @@ stripeEndpoint.post('/verify-session/:sessionId', zValidator('param', z.object({
 					paymentStatus: session.payment_status,
 					mode: session.mode,
 					plan: session.metadata?.plan,
+					customerDetails: session.customer_details,
+					customerId: session.customer
 				},
 				error: null
 			},
