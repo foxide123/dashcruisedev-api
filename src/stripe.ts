@@ -99,6 +99,9 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 			automatic_tax: {
 				enabled: true,
 			},
+			tax_id_collection: {
+				enabled: true
+			},
 			/* can only be provided when customer is provided 		
 			customer_update: {
 				address: 'auto'
