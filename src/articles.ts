@@ -11,15 +11,6 @@ type Bindings = {
 const articles = new Hono<{ Bindings: Bindings }>();
 
 articles.post('/', (c) => c.json('create a post', 201));
-articles.get('/:slug', zValidator('param', z.object({ slug: z.string() })), async (c) => {
-	const { slug } = c.req.valid('param');
-
-	const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
-
-	const response = await supabase.from('PostTranslation').select('*').eq('slug', slug);
-
-	return c.json(response);
-});
 
 articles.get('/slugs-with-locale', async (c) => {
 	const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
@@ -30,6 +21,17 @@ articles.get('/slugs-with-locale', async (c) => {
           locale
         )
       `);
+
+	return c.json(response);
+});
+
+
+articles.get('/:slug', zValidator('param', z.object({ slug: z.string() })), async (c) => {
+	const { slug } = c.req.valid('param');
+
+	const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
+
+	const response = await supabase.from('PostTranslation').select('*').eq('slug', slug);
 
 	return c.json(response);
 });
