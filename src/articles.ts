@@ -74,7 +74,7 @@ articles.get('/sections/:translationId', zValidator('param', z.object({translati
 		  )
 	  )
 	  `)
-	.eq("PostTranslation.id", translationId);
+	.eq("translation_id", translationId);
 
 	return c.json(response);
 })
