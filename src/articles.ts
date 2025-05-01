@@ -10,6 +10,17 @@ type Bindings = {
 
 const articles = new Hono<{ Bindings: Bindings }>();
 
+articles.post('/', (c) => c.json('create a post', 201));
+articles.get('/:slug', zValidator('param', z.object({ slug: z.string() })), async (c) => {
+	const { slug } = c.req.valid('param');
+
+	const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
+
+	const response = await supabase.from('PostTranslation').select('*').eq('slug', slug);
+
+	return c.json(response);
+});
+
 articles.get('/slugs-with-locale', async (c) => {
 	const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
 
@@ -42,15 +53,29 @@ articles.get('/slugs-with-locale/:postId', zValidator('param', z.object({ postId
 	return c.json(response);
 });
 
-articles.post('/', (c) => c.json('create a post', 201));
-articles.get('/:slug', zValidator('param', z.object({ slug: z.string() })), async (c) => {
-	const { slug } = c.req.valid('param');
+articles.get('/sections/:translationId', zValidator('param', z.object({translationId: z.string()})), async (c) => {
+	const { translationId } = c.req.valid('param');
 
 	const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
 
-	const response = await supabase.from('PostTranslation').select('*').eq('slug', slug);
+	const response = await supabase
+	.from("TranslationSections")
+	.select(`
+	  section_slug,
+	  section_title,
+	  order,
+	  PostTranslation(
+		  id,
+		  Post
+		  (
+		  id
+		  )
+	  )
+	  `)
+	.eq("PostTranslation.id", translationId);
 
 	return c.json(response);
-});
+})
+
 
 export default articles;
