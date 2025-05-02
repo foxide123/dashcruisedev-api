@@ -16,6 +16,8 @@ articles.get('/slugs-with-locale', async (c) => {
 	const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
 
 	const response = await supabase.from('ArticleTranslation').select(`
+		id,
+		article_id,
         slug,
         locale:Locale (
           locale
@@ -24,7 +26,6 @@ articles.get('/slugs-with-locale', async (c) => {
 
 	return c.json(response);
 });
-
 
 articles.get('/:slug', zValidator('param', z.object({ slug: z.string() })), async (c) => {
 	const { slug } = c.req.valid('param');
@@ -45,24 +46,27 @@ articles.get('/slugs-with-locale/:articleId', zValidator('param', z.object({ art
 		.from('ArticleTranslation')
 		.select(
 			`
+		id,
+		article_id,
         slug,
         locale:Locale (
           locale
         )
-      `
+      `,
 		)
 		.eq('article_id', articleId);
 	return c.json(response);
 });
 
-articles.get('/sections/:translationId', zValidator('param', z.object({translationId: z.string()})), async (c) => {
+articles.get('/sections/:translationId', zValidator('param', z.object({ translationId: z.string() })), async (c) => {
 	const { translationId } = c.req.valid('param');
 
 	const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
 
 	const response = await supabase
-	.from("TranslationSections")
-	.select(`
+		.from('TranslationSections')
+		.select(
+			`
 	  section_slug,
 	  section_title,
 	  order,
@@ -73,11 +77,11 @@ articles.get('/sections/:translationId', zValidator('param', z.object({translati
 		  id
 		  )
 	  )
-	  `)
-	.eq("translation_id", translationId);
+	  `,
+		)
+		.eq('translation_id', translationId);
 
 	return c.json(response);
-})
-
+});
 
 export default articles;
