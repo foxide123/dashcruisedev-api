@@ -36,8 +36,8 @@ articles.get('/:slug', zValidator('param', z.object({ slug: z.string() })), asyn
 	return c.json(response);
 });
 
-articles.get('/slugs-with-locale/:postId', zValidator('param', z.object({ postId: z.string() })), async (c) => {
-	const { postId } = c.req.valid('param');
+articles.get('/slugs-with-locale/:articleId', zValidator('param', z.object({ articleId: z.string() })), async (c) => {
+	const { articleId } = c.req.valid('param');
 
 	const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
 
@@ -51,7 +51,7 @@ articles.get('/slugs-with-locale/:postId', zValidator('param', z.object({ postId
         )
       `
 		)
-		.eq('post_id', postId);
+		.eq('article_id', articleId);
 	return c.json(response);
 });
 
