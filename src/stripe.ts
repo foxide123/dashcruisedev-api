@@ -14,18 +14,29 @@ type SupportedCurrency = 'usd' | 'eur' | 'pln' | 'ron';
 const SupportedCurrencies = ['usd', 'eur', 'pln', 'ron'];
 const SupportedCurrenciesArray = SupportedCurrencies.join(', ');
 
-const PlanNames = ['startup', 'standard'];
+const PlanNames = ['premium', 'startup', 'standard'];
 const PlanNamesString = PlanNames.join(', ');
 
 const WebsitePlansLookupKeys = [
+	//usd
 	'startup_monthly_usd',
 	'standard_monthly_usd',
+	'premium_monthly_usd',
+	
+	//eur
 	'startup_monthly_eur',
 	'standard_monthly_eur',
+	'premium_monthly_eur',
+
+	//pln
 	'startup_monthly_pln',
 	'standard_monthly_pln',
+	'premium_monthly_pln',
+
+	//ron
 	'startup_monthly_ron',
 	'standard_monthly_ron',
+	'premium_monthly_ron'
 ];
 
 type StripeParams = {
@@ -41,17 +52,31 @@ type SessionParams = {
 const stripeEndpoint = new Hono<{ Bindings: Bindings }>();
 
 stripeEndpoint.post('/website-plans/get-prices', async (c) => {
+
+/* 	const results: Record<SupportedCurrency, Stripe.ApiList<Stripe.Price> | null> = {
+		usd: null,
+		eur: null,
+		pln: null,
+		ron: null
+	}; */
+
 	const stripe = new Stripe(c.env.STRIPE_SECRET_KEY_LIVE, {
 		apiVersion: '2025-02-24.acacia; custom_checkout_beta=v1' as any,
 	});
 
 	try {
-		const prices = await stripe.prices.list({
-			lookup_keys: WebsitePlansLookupKeys,
-			expand: ['data.product'],
-		});
-		console.log('prices:', prices);
-		return c.json({ data: prices, error: null });
+		const allPrices: Stripe.Price[] = [];
+
+		for (const currency of SupportedCurrencies){
+			const keys = WebsitePlansLookupKeys.filter((k) => k.endsWith(`_${currency}`))
+			const prices = await stripe.prices.list({
+				lookup_keys: keys,
+				expand: ['data.product'],
+			});
+			allPrices.push(...prices.data);
+		}
+		console.log('prices:', allPrices);
+		return c.json({ data: allPrices, error: null });
 	} catch (error) {
 		return c.json({ data: null, error: `There was an error fetching prices: ${error instanceof Error ? error.message : error}` });
 	}
