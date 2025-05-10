@@ -148,7 +148,7 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 				plan: planName,
 			},
 		});
-		return c.json({ data: { sessionId: session.id }, error: null }, 201);
+		return c.json({ data: { url: session.url }, error: null }, 201);
 	} catch (error) {
 		console.error('Stripe error:', error);
 		return c.json({ data: null, error: `Error while creating checkout session: ${error instanceof Error ? error.message : error}` }, 500);
