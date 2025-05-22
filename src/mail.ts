@@ -25,8 +25,8 @@ mailEndpoint.post('/submit-form', async (c) => {
 		const resend = new Resend(resendApi);
 		const { data, error } = await resend.emails.send({
 			// from: `Acme <${email}>`,
-			from: 'Acme <contact@dashcruisedev.com>',
-			to: ['contact@dashcruisedev.com'],
+			from: 'Acme <contact@dashcruise.com>',
+			to: ['contact@dashcruise.com'],
 			replyTo: `${email}`,
 			subject: 'Name: Jakub, Message: Hello',
 			//subject: `Name: ${name}, Message: ${message}`,
