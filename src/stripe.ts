@@ -117,8 +117,8 @@ stripeEndpoint.post('/checkout-session', async (c) => {
 
 		const session = await stripe.checkout.sessions.create({
 			mode: 'subscription',
-			success_url: `https://dashcruisedev.com/${language}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
-			cancel_url: 'https://dashcruisedev.com/en',
+			success_url: `https://dashcruise.com/${language}/subscription/success?session_id={CHECKOUT_SESSION_ID}`,
+			cancel_url: 'https://dashcruise.com/en',
 			allow_promotion_codes: true,
 			locale: language,
 			automatic_tax: {
