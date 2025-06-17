@@ -36,7 +36,7 @@ newsletterEndpoint.post('/signup', async (c) => {
           }
 
 		const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_ANON_KEY);
-        const { error } = await supabase.from("Newsletter").insert({ email });
+        const { error } = await supabase.from("newsletter").insert({ email });
 		if (error) {
 			if (error.code === '23505') {
 				// 23505 = unique_violation in PostgreSQL

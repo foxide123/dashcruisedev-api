@@ -15,7 +15,7 @@ articles.post('/', (c) => c.json('create a post', 201));
 articles.get('/slugs-with-locale', async (c) => {
 	const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
 
-	const response = await supabase.from('ArticleTranslation').select(`
+	const response = await supabase.from('article_translation').select(`
 		id,
 		article_id,
         slug,
@@ -32,7 +32,7 @@ articles.get('/:slug', zValidator('param', z.object({ slug: z.string() })), asyn
 
 	const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
 
-	const response = await supabase.from('ArticleTranslation').select('*').eq('slug', slug);
+	const response = await supabase.from('article_translation').select('*').eq('slug', slug);
 
 	return c.json(response);
 });
@@ -43,7 +43,7 @@ articles.get('/slugs-with-locale/:articleId', zValidator('param', z.object({ art
 	const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
 
 	const response = await supabase
-		.from('ArticleTranslation')
+		.from('article_translation')
 		.select(
 			`
 		id,
@@ -64,7 +64,7 @@ articles.get('/sections/:translationId', zValidator('param', z.object({ translat
 	const supabase = createClient(c.env.SUPABASE_URL, c.env.SUPABASE_KEY);
 
 	const response = await supabase
-		.from('TranslationSections')
+		.from('translation_sections')
 		.select(
 			`
 	  section_slug,
